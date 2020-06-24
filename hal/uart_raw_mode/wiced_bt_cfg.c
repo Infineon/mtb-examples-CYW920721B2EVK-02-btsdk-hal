@@ -41,12 +41,14 @@
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_cfg.h"
 
+#define WICED_DEVICE_NAME                       "uart raw_mode"
+
 /*****************************************************************************
  * wiced_bt core stack configuration
  ****************************************************************************/
 const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 {
-    .device_name                         = (uint8_t*)"Hal Adc App",                                    /**< Local device name (NULL terminated) */
+    .device_name                         = (uint8_t*)WICED_DEVICE_NAME,                                /**< Local device name (NULL terminated) */
     .device_class                        = {0x00, 0x00, 0x00},                                         /**< Local device class */
     .security_requirement_mask           = BTM_SEC_NONE,                                               /**< Security requirements mask (BTM_SEC_NONE, or combinination of BTM_SEC_IN_AUTHENTICATE, BTM_SEC_OUT_AUTHENTICATE, BTM_SEC_ENCRYPT (see #wiced_bt_sec_level_e)) */
 
@@ -102,10 +104,9 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
         .high_duty_max_interval          = WICED_BT_CFG_DEFAULT_HIGH_DUTY_ADV_MAX_INTERVAL,            /**< High duty undirected connectable maximum advertising interval */
         .high_duty_duration              = 30,                                                         /**< High duty undirected connectable advertising duration in seconds (0 for infinite) */
 
-        .low_duty_min_interval           = WICED_BT_CFG_DEFAULT_LOW_DUTY_ADV_MIN_INTERVAL,             /**< Low duty undirected connectable minimum advertising interval */
-        .low_duty_max_interval           = WICED_BT_CFG_DEFAULT_LOW_DUTY_ADV_MAX_INTERVAL,             /**< Low duty undirected connectable maximum advertising interval */
+        .low_duty_min_interval           = 1024,                                                       /**< Low duty undirected connectable minimum advertising interval */
+        .low_duty_max_interval           = 1024,                                                       /**< Low duty undirected connectable maximum advertising interval */
         .low_duty_duration               = 60,                                                         /**< Low duty undirected connectable advertising duration in seconds (0 for infinite) */
-
         .high_duty_directed_min_interval = WICED_BT_CFG_DEFAULT_HIGH_DUTY_DIRECTED_ADV_MIN_INTERVAL,   /**< High duty directed connectable minimum advertising interval */
         .high_duty_directed_max_interval = WICED_BT_CFG_DEFAULT_HIGH_DUTY_DIRECTED_ADV_MAX_INTERVAL,   /**< High duty directed connectable maximum advertising interval */
 
@@ -127,9 +128,9 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
         .appearance                     = APPEARANCE_GENERIC_TAG,                                      /**< GATT appearance (see gatt_appearance_e) */
         .client_max_links               = 0,                                                           /**< Client config: maximum number of servers that local client can connect to  */
         .server_max_links               = 1,                                                           /**< Server config: maximum number of remote clients connections allowed by the local */
-        .max_attr_len                   = 23,                                                          /**< Maximum attribute length; gki_cfg must have a corresponding buffer pool that can hold this length */
+        .max_attr_len                   = 512,                                                         /**< Maximum attribute length; gki_cfg must have a corresponding buffer pool that can hold this length */
 #if !defined(CYW20706A2)
-        .max_mtu_size                   = 28                                                           /**< Maximum MTU size for GATT connections, should be between 23 and (max_attr_len + 5) */
+        .max_mtu_size                   = 517                                                          /**< Maximum MTU size for GATT connections, should be between 23 and (max_attr_len + 5) */
 #endif
     },
 
@@ -172,10 +173,10 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
     },
 
     /* LE Address Resolution DB size  */
-    .addr_resolution_db_size            = 0,                                                           /**< LE Address Resolution DB settings - effective only for pre 4.2 controller*/
+    .addr_resolution_db_size            = 5,                                                           /**< LE Address Resolution DB settings - effective only for pre 4.2 controller*/
 
 #ifdef CYW20706A2
-    .max_mtu_size                       = 28,                                                          /**< Maximum MTU size for GATT connections, should be between 23 and (max_attr_len + 5) */
+    .max_mtu_size                       = 517,                                                         /**< Maximum MTU size for GATT connections, should be between 23 and (max_attr_len + 5) */
     .max_pwr_db_val                     = 12                                                           /**< Max. power level of the device */
 #else
     /* Maximum number of buffer pools */
@@ -188,9 +189,10 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 #endif
 
 #if defined(CYW20719B2) || defined(CYW20721B2) || defined(CYW20819A1) || defined (CYW20820A1)
-    .default_ble_power_level            = 0                                                            /**< Default LE power level, Refer lm_TxPwrTable table for the power range */
+    .default_ble_power_level            = 12                                                           /**< Default LE power level, Refer lm_TxPwrTable table for the power range */
 #endif
 };
+
 
 /*****************************************************************************
  * wiced_bt_stack buffer pool configuration
@@ -203,8 +205,8 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 const wiced_bt_cfg_buf_pool_t wiced_bt_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS] =
 {
 /*  { buf_size, buf_count } */
-    { 64,       4   },      /* Small Buffer Pool */
-    { 360,      4   },      /* Medium Buffer Pool (used for HCI & RFCOMM control messages, min recommended size is 360) */
-    { 360,      12  },      /* Large Buffer Pool  (used for HCI ACL messages) */
-    { 700,      5   },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
+    { 64,       12  },      /* Small Buffer Pool */
+    { 360,      6   },      /* Medium Buffer Pool (used for HCI & RFCOMM control messages, min recommended size is 360) */
+    { 1056,     6   },      /* Large Buffer Pool  (used for HCI ACL messages) */
+    { 1056,     0   },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
 };
